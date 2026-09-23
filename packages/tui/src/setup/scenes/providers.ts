@@ -2,19 +2,18 @@ import { type SgrMouseEvent } from "../../mouse";
 import { TabBar } from "../../components/tab-bar";
 import { getTabBarTheme } from "../../chrome/shared";
 import { SignInTab } from "./sign-in";
-import { CustomProviderTab } from "./custom-provider";
 import type { SetupScene, SetupSceneController, SetupSceneHost, SetupTab } from "./types";
 import { WebSearchTab } from "./web-search";
 
 /**
- * Tabbed "Set up your providers" scene. Composes independent panels (model
- * sign-in, web search) behind a {@link TabBar}; the active panel owns
+ * Tabbed "Set up your providers" scene. Composes sign-in and web-search panels
+ * behind a {@link TabBar}; the active panel owns
  * rendering and input, while modal panels (e.g. an in-flight OAuth login)
  * temporarily suppress tab switching.
  */
 class ProvidersSceneController implements SetupSceneController {
 	title = "Set up your providers";
-	subtitle = "Sign in and pick a web search provider. Press Esc when you're done.";
+	subtitle = "Sign in, add a custom endpoint, and pick a web search provider. Press Esc when you're done.";
 
 	#tabs: SetupTab[];
 	#tabBar: TabBar;
@@ -22,7 +21,7 @@ class ProvidersSceneController implements SetupSceneController {
 	#tabRowCount = 1;
 
 	constructor(host: SetupSceneHost) {
-		this.#tabs = [new SignInTab(host), new CustomProviderTab(host), new WebSearchTab(host)];
+		this.#tabs = [new SignInTab(host), new WebSearchTab(host)];
 		this.#tabBar = new TabBar(
 			"Providers",
 			this.#tabs.map(tab => ({ id: tab.id, label: tab.label })),
