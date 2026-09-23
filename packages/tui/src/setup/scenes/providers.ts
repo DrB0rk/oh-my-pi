@@ -51,6 +51,10 @@ class ProvidersSceneController implements SetupSceneController {
 			tab.handleInput(data);
 			return;
 		}
+		if (tab.handlesInput?.(data)) {
+			tab.handleInput(data);
+			return;
+		}
 		if (this.#tabBar.handleInput(data)) return;
 		tab.handleInput(data);
 	}

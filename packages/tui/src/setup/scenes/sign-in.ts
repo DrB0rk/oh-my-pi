@@ -104,6 +104,10 @@ export class SignInTab implements SetupTab {
 		return this.#loggingInProvider !== undefined || this.#customProvider?.modal === true;
 	}
 
+	handlesInput(data: string): boolean {
+		return this.#customProvider !== undefined && (matchesKey(data, "left") || matchesKey(data, "right"));
+	}
+
 	onActivate(): void {
 		this.#customProvider?.onActivate?.();
 	}
@@ -230,18 +234,22 @@ export class SignInTab implements SetupTab {
 			{
 				requestRender: () => this.#host.requestRender(),
 				disabledProviders: this.#host.ctx.disabledProviders,
-				extraAction: {
-					id: "__omp_custom_provider__",
-					label: "Custom endpoint…",
-					onSelect: () => this.#openCustomProvider(),
-				},
+				extraAction: this.#host.ctx.addCustomProvider
+					? {
+							id: "__omp_custom_provider__",
+							label: "Custom endpoint…",
+							onSelect: () => this.#openCustomProvider(),
+						}
+					: undefined,
 			},
 		);
 	}
 
 	#openCustomProvider(): void {
 		if (this.#customProvider || this.#disposed) return;
-		this.#customProvider = new CustomProviderForm(this.#host, () => this.#closeCustomProvider());
+		const addProvider = this.#host.ctx.addCustomProvider;
+		if (!addProvider) return;
+		this.#customProvider = new CustomProviderForm(this.#host, addProvider, () => this.#closeCustomProvider());
 		this.#customProvider.onActivate?.();
 		this.#host.requestRender();
 	}
@@ -249,7 +257,6 @@ export class SignInTab implements SetupTab {
 	#closeCustomProvider(): void {
 		this.#customProvider?.dispose();
 		this.#customProvider = undefined;
-		this.#selector.resumeValidation();
 		this.#host.requestRender();
 	}
 
